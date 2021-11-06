@@ -126,6 +126,22 @@ router.post('/getResult', async (req, res) => {
   } else {
     // return res.json({ status: 200, level: level })
     // audio(req.body.name, { status: 200, name: req.body.name, level: level ,}, str)
+    exec('python3 ' + path.resolve(__dirname, '../src/pumch_em_v6.py') + JSON.stringify(test_data_dict), function (error, stdout, stderr) {
+      console.log('over 1',stderr)
+      if (error) {
+        console.log('stderr : ' + stderr);
+      }
+      console.log('exec111: ' + stdout);
+      let decisionPath = stdout.split("\n")[0]
+      setTimeout(()=>{
+        console.log(1);
+        audio(req.body.name, str)
+        wsd.send(JSON.stringify({ status: 200, name: req.body.name, level: level, decisionPath }))
+      },1000)
+      // audio(req.body.name, { status: 200, name: req.body.name, level: level, decisionPath }, str)
+      return res.json({ status: 200, level: level, decisionPath })
+    })
+    return
     console.log(22);
     setTimeout(()=>{
       console.log(req.body.name, str);
