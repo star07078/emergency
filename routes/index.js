@@ -53,13 +53,15 @@ function audio(name, str) {
 router.get('/', function (req, res, next) {
   res.render('index', { title: 'Express hello' });
 });
+router.get('/a', function (req, res, next) {
+  res.send('1111')
+});
 const exec = require('child_process').exec;
 const { EDESTADDRREQ } = require('constants');
 router.post('/getResult', async (req, res) => {
   let inputData = req.body;
   let level = getLevel(inputData);
   let str = '';
-  console.log(123);
   switch(level) {
     case 'ETS triage level-I':
       str = '危机';
@@ -99,9 +101,10 @@ router.post('/getResult', async (req, res) => {
       console.log('exec111: ' + stdout);
       let decisionPath = stdout.split("\n")[0]
       setTimeout(()=>{
-        // audio(req.body.name, str)
+        console.log(1);
+        audio(req.body.name, str)
         wsd.send(JSON.stringify({ status: 200, name: req.body.name, level: level, decisionPath }))
-      },10000)
+      },1000)
       // audio(req.body.name, { status: 200, name: req.body.name, level: level, decisionPath }, str)
       return res.json({ status: 200, level: level, decisionPath })
     })
@@ -109,7 +112,8 @@ router.post('/getResult', async (req, res) => {
     // return res.json({ status: 200, level: level })
     // audio(req.body.name, { status: 200, name: req.body.name, level: level ,}, str)
     setTimeout(()=>{
-      // audio(req.body.name, str)
+      console.log(2);
+      audio(req.body.name, str)
       wsd.send(JSON.stringify({ status: 200, name: req.body.name, level: level }))
     },10000)
     return res.json({ status: 200, level: level })
