@@ -51,9 +51,11 @@ function audio(name, str) {
 
 /* GET home page. */
 router.get('/', function (req, res, next) {
+  console.log('访问3000')
   res.render('index', { title: 'Express hello' });
 });
 router.get('/a', function (req, res, next) {
+  console.log('访问a')
   res.send('1111')
 });
 const exec = require('child_process').exec;
