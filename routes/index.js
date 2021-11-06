@@ -95,8 +95,9 @@ router.post('/getResult', async (req, res) => {
       'pulse pressure': pulsePressure
     }
     // 异步执行
-    exec('python3 src/pumch_em_v6.py ' + JSON.stringify(test_data_dict), function (error, stdout, stderr) {
-      // console.log('over 1')
+    console.log('------------');
+    exec('python3 ' + path.resolve(__dirname, '../src/pumch_em_v6.py') + JSON.stringify(test_data_dict), function (error, stdout, stderr) {
+      console.log('over 1',stderr)
       if (error) {
         console.log('stderr : ' + stderr);
       }
