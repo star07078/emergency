@@ -124,6 +124,19 @@ router.post('/getResult', async (req, res) => {
       return res.json({ status: 200, level: level, decisionPath })
     })
   } else {
+    let arrivalMode = inputData.sourceOfPatient
+    let shockIndex = (!inputData.systolicbloodpressure || !inputData.heartRate) ? -1 : (inputData.heartRate * 1.0 / inputData.systolicbloodpressure)
+    let pulsePressure = (!inputData.systolicbloodpressure || !inputData.diastolicbloodpressure) ? -1 : (inputData.systolicbloodpressure - inputData.diastolicbloodpressure)
+    let conscious = inputData.stateofconsciousness == "清醒" ? "conscious" : "altered mental status"
+    var myDate = new Date();
+    let arrivalTime = myDate.getHours()
+    
+    let test_data_dict = {
+      'triage level': level, 'age': inputData.age, 'sex': inputData.sex, 'systolic blood pressure': inputData.systolicbloodpressure,
+      'diastolic blood pressure': inputData.diastolicbloodpressure, 'heart rate': inputData.heartRate, 'oxygen saturation': inputData.oxygensaturation,
+      'state of consciousness': conscious, 'arrival mode': arrivalMode, 'arrival time': arrivalTime, 'shock index': shockIndex,
+      'pulse pressure': pulsePressure
+    }
     // return res.json({ status: 200, level: level })
     // audio(req.body.name, { status: 200, name: req.body.name, level: level ,}, str)
     exec('python3 ' + path.resolve(__dirname, '../src/pumch_em_v6.py') + JSON.stringify(test_data_dict), function (error, stdout, stderr) {
