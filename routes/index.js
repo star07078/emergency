@@ -19,19 +19,23 @@ ws.on('connection', (data) => {
 
 
 function audio(name, str) {
+  console.log('-----0--------');
   var postData = querystring.stringify({
     "lan": "zh",   
     "ie": "UTF-8",
     "spd": 5,
     "text": name + str
   });
+  console.log('-----1--------');
   var options = {
     "method": "GET",
     "hostname": "tts.baidu.com",
     "path": "/text2audio?" + postData
   };
+  console.log('-----2--------');
   var req1 = http.request(options, function (res) {
     var chunks = [];
+    console.log('-----3--------');
     res.on("data", function (chunk) {
       chunks.push(chunk);  // 获取到的音频文件数据暂存到chunks里面
     });
@@ -46,6 +50,7 @@ function audio(name, str) {
       },3000)
     });
   })
+  console.log('-----4--------');
   req1.end()
 }
 
@@ -115,9 +120,9 @@ router.post('/getResult', async (req, res) => {
     // audio(req.body.name, { status: 200, name: req.body.name, level: level ,}, str)
     console.log(22);
     setTimeout(()=>{
-      console.log(2);
-      // audio(req.body.name, str)
-      wsd.send(JSON.stringify({ status: 200, name: req.body.name, level: level }))
+      console.log(req.body.name, str);
+      audio(req.body.name, str)
+      // wsd.send(JSON.stringify({ status: 200, name: req.body.name, level: level }))
     },10000)
     return res.json({ status: 200, level: level })
   }
