@@ -49,7 +49,10 @@ function audio(name, str) {
       console.log('-----8--------');
       fs.writeFileSync(filePath, body);
       console.log('-----9--------');
+      console.log(filePath,body);
+      
       play.sound(filePath)
+      console.log('-----10--------');
       // setTimeout(()=>{
       //   fs.unlinkSync(`${__dirname}/${now}.wav`);
       // },3000)
