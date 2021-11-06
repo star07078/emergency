@@ -40,14 +40,19 @@ function audio(name, str) {
       chunks.push(chunk);  // 获取到的音频文件数据暂存到chunks里面
     });
     res.on("end", function () {
+      console.log('-----5--------');
       var body = Buffer.concat(chunks);
+      console.log('-----6--------');
       var now = Date.now();
+      console.log('-----7--------');
       var filePath = path.resolve(__dirname, `./${now}.wav`);
+      console.log('-----8--------');
       fs.writeFileSync(filePath, body);
+      console.log('-----9--------');
       play.sound(filePath)
-      setTimeout(()=>{
-        fs.unlinkSync(`${__dirname}/${now}.wav`);
-      },3000)
+      // setTimeout(()=>{
+      //   fs.unlinkSync(`${__dirname}/${now}.wav`);
+      // },3000)
     });
   })
   console.log('-----4--------');
@@ -123,7 +128,7 @@ router.post('/getResult', async (req, res) => {
       console.log(req.body.name, str);
       audio(req.body.name, str)
       // wsd.send(JSON.stringify({ status: 200, name: req.body.name, level: level }))
-    },10000)
+    },2000)
     return res.json({ status: 200, level: level })
   }
 })
