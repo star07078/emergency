@@ -1,78 +1,25 @@
 var express = require('express');
 var router = express.Router();
 var path = require("path");
-var WebSocket = require('ws');
-var http = require('http')
-var play = require('play');
-var querystring = require('querystring');    // 处理请求参数的querystring模块
-var fs = require('fs');      // fs模块，用来保存语音文件
+// var WebSocket = require('ws');
+// var http = require('http')
+// var play = require('play');
+// var querystring = require('querystring');    // 处理请求参数的querystring模块
+// var fs = require('fs');      // fs模块，用来保存语音文件
 
 
-let wsd = null;
+// let wsd = null;
 
-const ws = new WebSocket.Server({ port: 8081 }, () => {
-  console.log('连接成功')
-});
-ws.on('connection', (data) => {
-  wsd = data;
-})
+// const ws = new WebSocket.Server({ port: 8081 }, () => {
+//   console.log('连接成功')
+// });
+// ws.on('connection', (data) => {
+//   wsd = data;
+// })
 
 
-function audio(name, str) {
-  console.log('-----0--------');
-  var postData = querystring.stringify({
-    "lan": "zh",   
-    "ie": "UTF-8",
-    "spd": 5,
-    "text": name + str
-  });
-  console.log('-----1--------');
-  var options = {
-    "method": "GET",
-    "hostname": "tts.baidu.com",
-    "path": "/text2audio?" + postData
-  };
-  console.log('-----2--------');
-  var req1 = http.request(options, function (res) {
-    var chunks = [];
-    console.log('-----3--------');
-    res.on("data", function (chunk) {
-      chunks.push(chunk);  // 获取到的音频文件数据暂存到chunks里面
-    });
-    res.on("end", function () {
-      console.log('-----5--------');
-      var body = Buffer.concat(chunks);
-      console.log('-----6--------');
-      var now = Date.now();
-      console.log('-----7--------');
-      var filePath = path.resolve(__dirname, `./${now}.wav`);
-      console.log('-----8--------');
-      fs.writeFileSync(filePath, body);
-      console.log('-----9--------');
-      console.log(filePath,body);
-      
-      play.sound(filePath)
-      console.log('-----10--------');
-      // setTimeout(()=>{
-      //   fs.unlinkSync(`${__dirname}/${now}.wav`);
-      // },3000)
-    });
-  })
-  console.log('-----4--------');
-  req1.end()
-}
+let {exec} = require('child_process');
 
-/* GET home page. */
-router.get('/', function (req, res, next) {
-  console.log('访问3000')
-  res.render('index', { title: 'Express hello' });
-});
-router.get('/a', function (req, res, next) {
-  console.log('访问a')
-  res.send('1111')
-});
-const exec = require('child_process').exec;
-const { EDESTADDRREQ } = require('constants');
 router.post('/getResult', async (req, res) => {
   let inputData = req.body;
   let level = getLevel(inputData);
@@ -109,19 +56,11 @@ router.post('/getResult', async (req, res) => {
     }
     // 异步执行
     exec('python3 ' + path.resolve(__dirname, '../src/pumch_em_v6.py') + JSON.stringify(test_data_dict), function (error, stdout, stderr) {
-      console.log('over 1',stderr)
       if (error) {
         console.log('stderr : ' + stderr);
       }
-      console.log('exec111: ' + stdout);
       let decisionPath = stdout.split("\n")[0]
-      setTimeout(()=>{
-        console.log(1);
-        audio(req.body.name, str)
-        wsd.send(JSON.stringify({ status: 200, name: req.body.name, level: level, decisionPath }))
-      },1000)
-      // audio(req.body.name, { status: 200, name: req.body.name, level: level, decisionPath }, str)
-      return res.json({ status: 200, level: level, decisionPath })
+      res.send({ status: 200, name: req.body.name, level: level, decisionPath, str})
     })
   } else {
     let arrivalMode = inputData.sourceOfPatient
@@ -137,31 +76,13 @@ router.post('/getResult', async (req, res) => {
       'state of consciousness': conscious, 'arrival mode': arrivalMode, 'arrival time': arrivalTime, 'shock index': shockIndex,
       'pulse pressure': pulsePressure
     }
-    // return res.json({ status: 200, level: level })
-    // audio(req.body.name, { status: 200, name: req.body.name, level: level ,}, str)
     exec('python3 ' + path.resolve(__dirname, '../src/pumch_em_v6.py') + JSON.stringify(test_data_dict), function (error, stdout, stderr) {
-      console.log('over 1',stderr)
       if (error) {
         console.log('stderr : ' + stderr);
       }
-      console.log('exec111: ' + stdout);
-      let decisionPath = stdout.split("\n")[0]
-      setTimeout(()=>{
-        console.log(1);
-        audio(req.body.name, str)
-        wsd.send(JSON.stringify({ status: 200, name: req.body.name, level: level, decisionPath }))
-      },1000)
-      // audio(req.body.name, { status: 200, name: req.body.name, level: level, decisionPath }, str)
-      return res.json({ status: 200, level: level, decisionPath })
+      let decisionPath = stdout.split("\n")[0];
+      res.send({ status: 200, name: req.body.name, level: level, decisionPath, str})
     })
-    return
-    console.log(22);
-    setTimeout(()=>{
-      console.log(req.body.name, str);
-      audio(req.body.name, str)
-      // wsd.send(JSON.stringify({ status: 200, name: req.body.name, level: level }))
-    },2000)
-    return res.json({ status: 200, level: level })
   }
 })
 
