@@ -1,24 +1,23 @@
 var express = require('express');
 var router = express.Router();
 var path = require("path");
-// var WebSocket = require('ws');
-// var http = require('http')
-// var play = require('play');
-// var querystring = require('querystring');    // 处理请求参数的querystring模块
-// var fs = require('fs');      // fs模块，用来保存语音文件
+var WebSocket = require('ws');
 
 
-// let wsd = null;
+let wsd = null;
 
-// const ws = new WebSocket.Server({ port: 8081 }, () => {
-//   console.log('连接成功')
-// });
-// ws.on('connection', (data) => {
-//   wsd = data;
-// })
+const ws = new WebSocket.Server({ port: 8081 }, () => {
+  console.log('连接成功')
+});
+ws.on('connection', (data) => {
+  wsd = data;
+})
 
-
-let {exec} = require('child_process');
+/* GET home page. */
+router.get('/', function (req, res, next) {
+  res.render('index', { title: 'Express hello' });
+});
+const ec = require('child_process')
 
 router.post('/getResult', async (req, res) => {
   let inputData = req.body;
@@ -55,34 +54,26 @@ router.post('/getResult', async (req, res) => {
       'pulse pressure': pulsePressure
     }
     // 异步执行
-    exec('python3 ' + path.resolve(__dirname, '../src/pumch_em_v6.py') + JSON.stringify(test_data_dict), function (error, stdout, stderr) {
+    ec.exec('python3 src/pumch_em_v6.py ' + JSON.stringify(test_data_dict), function (error, stdout, stderr) {
       if (error) {
         console.log('stderr : ' + stderr);
       }
       let decisionPath = stdout.split("\n")[0]
-      res.send({ status: 200, name: req.body.name, level: level, decisionPath, str})
+      wsd.send(JSON.stringify({ status: 200, name: req.body.name, level: level, decisionPath }))
+      setTimeout(()=>{
+        ec.exec('termux-tts-speak '+req.body.name+str)
+        // console.log(111);
+      },5000)
+      // audio(req.body.name, { status: 200, name: req.body.name, level: level, decisionPath }, str)
+      return res.json({ status: 200, level: level, decisionPath })
     })
   } else {
-    let arrivalMode = inputData.sourceOfPatient
-    let shockIndex = (!inputData.systolicbloodpressure || !inputData.heartRate) ? -1 : (inputData.heartRate * 1.0 / inputData.systolicbloodpressure)
-    let pulsePressure = (!inputData.systolicbloodpressure || !inputData.diastolicbloodpressure) ? -1 : (inputData.systolicbloodpressure - inputData.diastolicbloodpressure)
-    let conscious = inputData.stateofconsciousness == "清醒" ? "conscious" : "altered mental status"
-    var myDate = new Date();
-    let arrivalTime = myDate.getHours()
-    
-    let test_data_dict = {
-      'triage level': level, 'age': inputData.age, 'sex': inputData.sex, 'systolic blood pressure': inputData.systolicbloodpressure,
-      'diastolic blood pressure': inputData.diastolicbloodpressure, 'heart rate': inputData.heartRate, 'oxygen saturation': inputData.oxygensaturation,
-      'state of consciousness': conscious, 'arrival mode': arrivalMode, 'arrival time': arrivalTime, 'shock index': shockIndex,
-      'pulse pressure': pulsePressure
-    }
-    exec('python3 ' + path.resolve(__dirname, '../src/pumch_em_v6.py') + JSON.stringify(test_data_dict), function (error, stdout, stderr) {
-      if (error) {
-        console.log('stderr : ' + stderr);
-      }
-      let decisionPath = stdout.split("\n")[0];
-      res.send({ status: 200, name: req.body.name, level: level, decisionPath, str})
-    })
+    wsd.send(JSON.stringify({ status: 200, name: req.body.name, level: level }))
+    setTimeout(()=>{
+      ec.exec('termux-tts-speak '+req.body.name+str)
+      // console.log(222);
+    },5000)
+    return res.json({ status: 200, level: level })
   }
 })
 
