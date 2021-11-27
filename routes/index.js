@@ -62,7 +62,7 @@ router.post('/getResult', async (req, res) => {
       wsd.send(JSON.stringify({ status: 200, name: req.body.name, level: level, decisionPath }))
       setTimeout(()=>{
         ec.exec('termux-tts-speak '+req.body.name+str)
-        // console.log(111);
+        console.log(111);
       },5000)
       // audio(req.body.name, { status: 200, name: req.body.name, level: level, decisionPath }, str)
       return res.json({ status: 200, level: level, decisionPath })
@@ -71,7 +71,7 @@ router.post('/getResult', async (req, res) => {
     wsd.send(JSON.stringify({ status: 200, name: req.body.name, level: level }))
     setTimeout(()=>{
       ec.exec('termux-tts-speak '+req.body.name+str)
-      // console.log(222);
+      console.log(222);
     },5000)
     return res.json({ status: 200, level: level })
   }
