@@ -59,21 +59,21 @@ router.post('/getResult', async (req, res) => {
         console.log('stderr : ' + stderr);
       }
       let decisionPath = stdout.split("\n")[0]
-      wsd.send(JSON.stringify({ status: 200, name: req.body.name, level: level, decisionPath }))
+      // wsd.send(JSON.stringify({ status: 200, name: req.body.name, level: level, decisionPath }))
       setTimeout(()=>{
-        ec.exec('termux-tts-speak '+req.body.name+str)
-        console.log(111);
+        // ec.exec('termux-tts-speak '+req.body.name+str)
+        wsd.send(JSON.stringify({message: req.body.name+str}))
       },5000)
       // audio(req.body.name, { status: 200, name: req.body.name, level: level, decisionPath }, str)
-      return res.json({ status: 200, level: level, decisionPath })
+      res.json({ status: 200, level: level, decisionPath })
     })
   } else {
-    wsd.send(JSON.stringify({ status: 200, name: req.body.name, level: level }))
+    // wsd.send(JSON.stringify({ status: 200, name: req.body.name, level: level }))
     setTimeout(()=>{
-      ec.exec('termux-tts-speak '+req.body.name+str)
-      console.log(222);
+      // ec.exec('termux-tts-speak '+req.body.name+str)
+      wsd.send(JSON.stringify({message: req.body.name+str}))
     },5000)
-    return res.json({ status: 200, level: level })
+    res.json({ status: 200, level: level })
   }
 })
 
