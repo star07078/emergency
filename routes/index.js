@@ -15,7 +15,12 @@ ws.on('connection', (data) => {
 })
 
 const { EDESTADDRREQ } = require('constants');
+router.get('/', async (req, res) => {
+  console.log('get');
+  res.send('hello world')
+})
 router.post('/getResult', async (req, res) => {
+  console.log('post');
   let inputData = req.body;
   let level = getLevel(inputData);
   let str = '', audio = 'bjj';
