@@ -1,7 +1,7 @@
 var express = require('express');
 var router = express.Router();
 var path = require("path");
-var play = require('play');
+// var play = require('play');
 var WebSocket = require('ws');
 var fs = require('fs');      // fs模块，用来保存语音文件
 var ec = require('child_process')
@@ -66,14 +66,15 @@ router.post('/getResult', async (req, res) => {
       }
       let decisionPath = stdout.split("\n")[0]
       setTimeout(()=>{
-        play.sound(path.resolve(__dirname, '../static/tixing.wav'))
+        ec.exec('termux-media-player play ' + path.resolve(__dirname, '../static/tixing.wav'))
         wsd.send(JSON.stringify({ status: 200, str, name: req.body.name, level: level, decisionPath }))
       },1000)
       res.json({ status: 200, level: level, decisionPath })
     })
   } else {
     setTimeout(()=>{
-      play.sound(path.resolve(__dirname, '../static/tixing.wav'))
+      ec.exec('termux-media-player play ' + path.resolve(__dirname, '../static/tixing.wav'))
+      // play.sound(path.resolve(__dirname, '../static/tixing.wav'))
       wsd.send(JSON.stringify({ status: 200,str, name: req.body.name, level: level }))
     },1000)
     res.json({ status: 200, level: level })
