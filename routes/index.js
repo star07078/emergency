@@ -1,11 +1,12 @@
 var express = require('express');
 var router = express.Router();
 var path = require("path");
+var play = require('play');
 var WebSocket = require('ws');
-
+var fs = require('fs');      // fs模块，用来保存语音文件
+var ec = require('child_process')
 
 let wsd = null;
-
 const ws = new WebSocket.Server({ port: 8081 }, () => {
   console.log('连接成功')
 });
@@ -13,31 +14,31 @@ ws.on('connection', (data) => {
   wsd = data;
 })
 
-/* GET home page. */
-router.get('/', function (req, res, next) {
-  res.render('index', { title: 'Express hello' });
-});
-const ec = require('child_process')
-
+const { EDESTADDRREQ } = require('constants');
 router.post('/getResult', async (req, res) => {
   let inputData = req.body;
   let level = getLevel(inputData);
-  let str = '';
+  let str = '', audio = 'bjj';
   switch(level) {
     case 'ETS triage level-I':
       str = '危机';
+      audio = 'wj';
       break;
     case 'ETS triage level-II':
       str = '危重';
+      audio = 'wz';
       break;
     case 'ETS triage level-III':
       str = '紧急';
+      audio = 'jj';
       break;
     case 'ETS triage level-IV':
       str = '不紧急';
+      audio = 'bjj';
       break;
     default:
       str = '不紧急';
+      audio = 'bjj';
   }
   if (level == 'ETS triage level-III' || level == 'ETS triage level-IV') {
     let arrivalMode = inputData.sourceOfPatient
@@ -59,20 +60,17 @@ router.post('/getResult', async (req, res) => {
         console.log('stderr : ' + stderr);
       }
       let decisionPath = stdout.split("\n")[0]
-      // wsd.send(JSON.stringify({ status: 200, name: req.body.name, level: level, decisionPath }))
       setTimeout(()=>{
-        // ec.exec('termux-tts-speak '+req.body.name+str)
-        wsd.send(JSON.stringify({message: req.body.name+str}))
-      },5000)
-      // audio(req.body.name, { status: 200, name: req.body.name, level: level, decisionPath }, str)
+        play.sound(path.resolve(__dirname, '../static/tixing.wav'))
+        wsd.send(JSON.stringify({ status: 200, str, name: req.body.name, level: level, decisionPath }))
+      },1000)
       res.json({ status: 200, level: level, decisionPath })
     })
   } else {
-    // wsd.send(JSON.stringify({ status: 200, name: req.body.name, level: level }))
     setTimeout(()=>{
-      // ec.exec('termux-tts-speak '+req.body.name+str)
-      wsd.send(JSON.stringify({message: req.body.name+str}))
-    },5000)
+      play.sound(path.resolve(__dirname, '../static/tixing.wav'))
+      wsd.send(JSON.stringify({ status: 200,str, name: req.body.name, level: level }))
+    },1000)
     res.json({ status: 200, level: level })
   }
 })

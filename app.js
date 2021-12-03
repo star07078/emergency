@@ -9,7 +9,6 @@ var usersRouter = require('./routes/users');
 // var decision = require('./decision.png');
 
 var app = express();
-app.use(express.static('static'))
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
