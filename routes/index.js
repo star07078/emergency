@@ -70,7 +70,7 @@ router.post('/getResult', async (req, res) => {
       setTimeout(()=>{
         ec.exec('termux-media-player play ' + path.resolve(__dirname, '../static/tixing.wav'))
         wsd.send(JSON.stringify({ status: 200, str, name: req.body.name, level: level, decisionPath }))
-      },1000)
+      },5000)
       res.json({ status: 200, level: level, decisionPath })
     })
   } else {
@@ -78,7 +78,7 @@ router.post('/getResult', async (req, res) => {
       ec.exec('termux-media-player play ' + path.resolve(__dirname, '../static/tixing.wav'))
       // play.sound(path.resolve(__dirname, '../static/tixing.wav'))
       wsd.send(JSON.stringify({ status: 200,str, name: req.body.name, level: level }))
-    },1000)
+    },5000)
     res.json({ status: 200, level: level })
   }
 })
