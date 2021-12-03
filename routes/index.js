@@ -14,6 +14,8 @@ ws.on('connection', (data) => {
   wsd = data;
 })
 
+router.use(express.static('static'))
+
 const { EDESTADDRREQ } = require('constants');
 router.get('/', async (req, res) => {
   console.log('get');
