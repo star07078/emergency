@@ -28,7 +28,7 @@ router.get('/', async (req, res) => {
   res.send('hello world')
 })
 router.post('/file', function(req, res) {
-  let now = Date.now();
+  let now = req.body.name + Date.now();
   var buffer = xlsx.build([{name: "mySheetName", data: req.body.file}]); 
   fs.appendFile(path.resolve(__dirname,`../static/xlsx/${now}.xlsx`), buffer, function (err) {
     if (err) {
@@ -91,14 +91,14 @@ router.post('/getResult', async (req, res) => {
       setTimeout(()=>{
         ec.exec('termux-media-player play ' + path.resolve(__dirname, '../static/tixing.wav'))
         wsd.send(JSON.stringify({ status: 200, str, name: req.body.name, level: level, decisionPath }))
-      },1000 * 5)
+      },1000 * 60 * 30)
       res.json({ status: 200, level: level, decisionPath })
     })
   } else {
     setTimeout(()=>{
       ec.exec('termux-media-player play ' + path.resolve(__dirname, '../static/tixing.wav'))
       wsd.send(JSON.stringify({ status: 200,str, name: req.body.name, level: level }))
-    },1000 * 5)
+    },1000 * 60 * 30)
     res.json({ status: 200, level: level })
   }
 })
