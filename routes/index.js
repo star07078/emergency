@@ -89,14 +89,14 @@ router.post('/getResult', async (req, res) => {
       }
       let decisionPath = stdout.split("\n")[0]
       setTimeout(()=>{
-        // ec.exec('termux-media-player play ' + path.resolve(__dirname, '../static/tixing.wav'))
+        ec.exec('termux-media-player play ' + path.resolve(__dirname, '../static/tixing.wav'))
         wsd.send(JSON.stringify({ status: 200, str, name: req.body.name, level: level, decisionPath }))
       },1000 * 5)
       res.json({ status: 200, level: level, decisionPath })
     })
   } else {
     setTimeout(()=>{
-      // ec.exec('termux-media-player play ' + path.resolve(__dirname, '../static/tixing.wav'))
+      ec.exec('termux-media-player play ' + path.resolve(__dirname, '../static/tixing.wav'))
       wsd.send(JSON.stringify({ status: 200,str, name: req.body.name, level: level }))
     },1000 * 5)
     res.json({ status: 200, level: level })
