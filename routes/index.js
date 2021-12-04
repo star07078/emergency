@@ -40,7 +40,7 @@ router.post('/file', function(req, res) {
 
   // console.log(req.body.file);
   // fs.writeFile(path.resolve(__dirname, '../static/a.xlsx'), req.body.file)
-  res.send({src: `http://127.0.0.1:3000/xlsx${now}.xlsx`});
+  res.send({src: `http://127.0.0.1:3000/xlsx/${now}.xlsx`});
 })
 router.post('/getResult', async (req, res) => {
   console.log('post');
