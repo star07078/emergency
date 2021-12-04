@@ -10,6 +10,12 @@ var usersRouter = require('./routes/users');
 
 var app = express();
 
+var bodyParser=require("body-parser");
+ 
+// 解析以 application/json 和 application/x-www-form-urlencoded 提交的数据
+var jsonParser = bodyParser.json();
+var urlencodedParser = bodyParser.urlencoded({ extended: false });
+
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');

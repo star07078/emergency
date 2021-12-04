@@ -6,6 +6,12 @@ var WebSocket = require('ws');
 var fs = require('fs');      // fs模块，用来保存语音文件
 var ec = require('child_process')
 
+
+//生成Excel依赖包
+var xlsx = require('node-xlsx')
+
+
+
 let wsd = null;
 const ws = new WebSocket.Server({ port: 8081 }, () => {
   console.log('连接成功')
@@ -20,6 +26,20 @@ const { EDESTADDRREQ } = require('constants');
 router.get('/', async (req, res) => {
   console.log('get');
   res.send('hello world')
+})
+router.post('/file', function(req, res) {
+  var buffer = xlsx.build([{name: "mySheetName", data: req.body.file}]); 
+  fs.appendFile(path.resolve(__dirname,'./data.xlsx'), buffer, function (err) {
+    if (err) {
+        console.log(err, '保存excel出错')
+    } else {
+        console.log('写入excel成功!!!')
+    }
+  })
+
+  // console.log(req.body.file);
+  // fs.writeFile(path.resolve(__dirname, '../static/a.xlsx'), req.body.file)
+  res.send('88866')
 })
 router.post('/getResult', async (req, res) => {
   console.log('post');
@@ -68,15 +88,14 @@ router.post('/getResult', async (req, res) => {
       }
       let decisionPath = stdout.split("\n")[0]
       setTimeout(()=>{
-        ec.exec('termux-media-player play ' + path.resolve(__dirname, '../static/tixing.wav'))
+        // ec.exec('termux-media-player play ' + path.resolve(__dirname, '../static/tixing.wav'))
         wsd.send(JSON.stringify({ status: 200, str, name: req.body.name, level: level, decisionPath }))
       },1000 * 5)
       res.json({ status: 200, level: level, decisionPath })
     })
   } else {
     setTimeout(()=>{
-      ec.exec('termux-media-player play ' + path.resolve(__dirname, '../static/tixing.wav'))
-      // play.sound(path.resolve(__dirname, '../static/tixing.wav'))
+      // ec.exec('termux-media-player play ' + path.resolve(__dirname, '../static/tixing.wav'))
       wsd.send(JSON.stringify({ status: 200,str, name: req.body.name, level: level }))
     },1000 * 5)
     res.json({ status: 200, level: level })
